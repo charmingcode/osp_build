@@ -1,0 +1,62 @@
+#!/bin/bash
+
+set -x
+
+sed -i "s%/usr/sbin/sshd -D \$OPTIONS%/sbin/start_sshd \$OPTIONS%" /usr/lib/systemd/system/sshd.service
+
+cat /usr/lib/systemd/system/sshd.service
+
+cat <<EOF >/sbin/start_sshd
+#!/bin/bash
+set -x
+PYTHON=/usr/bin/python
+SSHD=/usr/sbin/sshd
+for i in {1..5}; do
+  \$SSHD -p $PORT \$*
+  RETVAL=\$?
+  if [ \$RETVAL -eq 0 ] ; then
+    echo "$PORT" > /etc/sshd_port
+    break
+  fi
+done
+EOF
+
+chmod a+x /sbin/start_sshd
+cat /sbin/start_sshd
+
+if [ -f /tmp/.passwd ]; then
+  hippouser=`cat /tmp/.passwd | awk -F: '{print $1}'`
+  cat /etc/passwd | awk -F: '{print $1}' | grep -w -q $hippouser
+  if [ $? -eq 0 ]; then
+    sed -i "/$hippouser:x:/d" /etc/passwd
+  fi
+  echo `cat /tmp/.passwd` >> /etc/passwd
+
+  cat /etc/passwd | awk -F: '{print $1}' | grep -w -q $hippouser
+  if [ $? -eq 0 ]; then
+    sed -i "/$hippouser:/d" /etc/shadow
+  fi
+  echo "$hippouser:x:17000:0:99999:7:::" >> /etc/shadow
+fi
+
+if [ -f /tmp/.group ]; then
+  hippogroup=`cat /tmp/.group | awk -F: '{print $1}'`
+  cat /etc/group | awk -F: '{print $1}' | grep -w -q $hippogroup
+  if [ $? -eq 0 ]; then
+    sed -i "/$hippogroup:x:/d" /etc/group
+  fi
+  echo `cat /tmp/.group` >> /etc/group
+fi
+
+echo -e "\n$USER ALL=(ALL) NOPASSWD:ALL\n" >> /etc/sudoers
+
+yum clean all
+
+chmod 0600 /etc/ssh/ssh_host_rsa_key
+
+/sbin/start_sshd >/var/log/docker_sshd.log 2>&1
+while true
+do
+  ls -l /etc/ssh/ssh_host_rsa_key
+  sleep 1000
+done
