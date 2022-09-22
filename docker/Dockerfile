@@ -17,7 +17,7 @@ RUN yum install -y openssh-server libaio libnsl
 RUN yum install -y glibc glibc-devel
 RUN yum install -y gcc gcc-c++ libstdc++-devel binutils gdb
 
-RUN yum install bison
+RUN yum install -y flex bison
 
 # Install pcre
 RUN yum install -y pcre pcre-devel
