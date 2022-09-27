@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -ex
+
+SCRIPT_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd)"
+
+export HOME=/home/`whoami`
+export PATH=/home/tops/bin/:$PATH
+export LOG_PATH=/var/log/osp/wtty
+sudo mkdir -p $LOG_PATH
+sudo chown -R `whoami`:users $LOG_PATH
+if [ "$OSP_WTTY_PORT" == "" ]; then
+  export OSP_WTTY_PORT=10090
+fi
+
+cd $HOME
+export TTYD=/usr/local/bin/ttyd
+nohup $TTYD -i 0.0.0.0 -c osp:osp -a -p $OSP_WTTY_PORT bash >$LOG_PATH/wtty.log 2>&1 &

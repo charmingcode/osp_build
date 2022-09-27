@@ -275,7 +275,7 @@ class ExportCmdsTool(CommandTool):
         ('s', 'show', 'show content of the config file on screen', False),
         ('c', 'config-file', 'specify bash-completion config file ,default config file is %s' % self.default_config_file, ""),
         ('S', 'shell', 'export bash-completion shell script or not', False),
-        ('n', 'cmd-names', 'specify command names(e.g: "hi" or "hi, honebox") when exporting bash-completion shell script,  default command is just "%s"' %
+        ('n', 'cmd-names', 'specify command names(e.g: "hi" or "hi, onebox") when exporting bash-completion shell script,  default command is just "%s"' %
          self.cmdname, self.cmdname, ),
         ('d', 'disable-cover', 'Disable covering existed config file or not', False),
         ('w', 'wordlist', 'accept a incomplete command then return bash-completion wordlist and disable other \'export_cmds\' function', "")

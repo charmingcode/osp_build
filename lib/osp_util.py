@@ -668,3 +668,15 @@ def auto_update(root):
     cd(root, show_log=False)
     ret = run("git pull --rebase", assert_ok=False, show_log=True)
     popd(show_log=False)
+
+def pidstr(text):
+  ret = ""
+  text = text.replace("\n", " ")
+  tokens = text.split(" ")
+  for token in tokens:
+    token = token.strip()
+    if token:
+      if ret:
+        ret += " "
+      ret += token
+  return ret

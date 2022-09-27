@@ -1,0 +1,91 @@
+#!/bin/env python
+import sys
+sys.path.insert(1, "/usr/local/osp-build/lib")
+from osp_util import *
+import socket
+
+def get_random_ports(count):
+  ports = []
+  socks = []
+  base = 10000 + int(random.random() * 9000)
+  for i in xrange(base, base + 1000):
+    sock = socket.socket()
+    try:
+      sock.bind(("", i))
+    except Exception, e:
+      warn("socket bind fail on port %d" % i)
+      continue
+
+    port = sock.getsockname()[1]
+    socks.append(sock)
+    ports.append(port)
+    if len(ports) >= count:
+      break
+  for i in xrange(0, count):
+    socks[i].close()
+  return ports
+
+def ps_str():
+  return "ps -ef | grep ttyd | grep -v grep | awk '{print $2}'"
+
+def get_pids():
+  return pidstr(runex(ps_str(), assert_ok = False))
+
+def stop():
+  stop_process(ps_str())
+
+def start():
+  port = 0
+  if os.path.exists("/etc/wtty.port"):
+    port = int(read_file("/etc/wtty.port"))
+  else:
+    port = get_random_ports(1)[0]
+    run("sudo echo %d | sudo tee /etc/wtty.port" % port)
+
+  pids = get_pids()
+  if pids:
+    stop()
+
+  os.environ["OSP_WTTY_PORT"] = str(port)
+  make_dir("/var/log/osp/wtty", sudo=True)
+  run("/usr/local/osp-build/onebox/wtty_start")
+
+  for i in range(0, 30):
+    pids = get_pids()
+    if pids:
+      return
+    time.sleep(1)
+  fatal("wait 30 seconds, bug start fail")
+
+def get_status():
+  pids = get_pids()
+  if not pids:
+    fatal("pid not found")
+  print "pid " + pids
+
+  port = read_file("/etc/wtty.port").strip()
+  ip = runex("hostname -i").strip()
+  print "url: http://osp:osp@%s:%s/" % (ip, port)
+
+def main():
+  log_set_show_date(False)
+  log_set_show_pid(False)
+  log_set_show_src(False)
+
+  if len(sys.argv) < 2:
+    fatal("wtty restart|start|stop|status")
+
+  if sys.argv[1] == "stop":
+    stop()
+  elif sys.argv[1] == "start":
+    start()
+  elif sys.argv[1] == "status":
+    get_status()
+  elif sys.argv[1] == "restart":
+    stop()
+    start()
+  else:
+    fatal("wtty restart|start|stop|status")
+  return 0
+
+sys.exit(main())

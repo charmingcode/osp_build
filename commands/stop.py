@@ -11,14 +11,14 @@ import docker
 class Tool(cmd_base.CommandTool):
   def __init__(self, env):
     cmd_base.CommandTool.__init__(self, env, "stop",
-                                  "destroy running containers of holo build", [
+                                  "destroy running containers of osp build", [
                                       ('n', 'container-name', "the name of the container to stop, if not set, stop all", ""),
                                       ('f', 'force', "force to stop", False)
                                   ])
 
   def rm_files(self, name):
     env = self.env
-    run("rm -rf %s/.holo/%s*" % (env.home, name))
+    run("rm -rf %s/.osp/%s*" % (env.home, name))
 
   def main(self):
     force = self.get_opt('force')

@@ -60,6 +60,9 @@ RUN  wget https://github.com/tsl0922/ttyd/archive/1.2.1.tar.gz \
 RUN cd /ttyd-1.2.1/build  && echo "CMAKE_C_FLAGS:STRING=--std=c99"  >> ./CMakeCache.txt \
     && cmake .. && make && make install && rm -rf /*.gz
 
+COPY wtty .
+RUN mv wtty /usr/bin/
+
 # Config bashrc/bash_profile
 RUN echo "alias ls='ls --color=auto'" >> /root/.bashrc
 RUN echo "alias vi='vim'" >> /root/.bashrc
