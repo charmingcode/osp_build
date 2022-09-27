@@ -341,7 +341,7 @@ def start_docker(env):
 
     for opt in env.options:
         if opt.find("--net=host") >= 0 and is_mac_platform():
-            cmd += " " + env.port_range
+            cmd += " " + env.nonlinux_port_range
             continue
         cmd += " " + opt
 

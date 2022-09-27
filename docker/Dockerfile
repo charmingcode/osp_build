@@ -35,9 +35,30 @@ RUN yum install -y git automake libtool make.x86_64 cmake.x86_64 patch
 # Install bazel
 #RUN curl https://copr.fedorainfracloud.org/coprs/vbatts/bazel/repo/epel-7/vbatts-bazel-epel-7.repo -o /etc/yum.repos.d/CentOS-Bazek.repo && yum install -y bazel3
 
+
+# Install kube
+
+# RUN curl -LO https://dl.k8s.io/release/v1.21.3/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl && chmod +x /usr/local/bin/kubectl
+
 # Install seastar 
 COPY install-dependencies.sh .
 RUN ./install-dependencies.sh
+
+# wtty
+# 安装依赖
+RUN yum -y install vim-common cmake json-c-devel libwebsockets-devel openssl-devel wget make
+# 安装libwebsockets
+# RUN wget https://github.com/warmcat/libwebsockets/archive/v2.0-stable.tar.gz
+COPY libwebsockets-2.0-stable.tar.gz .
+RUN tar -zxvf libwebsockets-2.0-stable.tar.gz \
+    && cd /libwebsockets-2.0-stable && mkdir build && cd build && cmake .. -DLIB_SUFFIX=64 && make && make install
+# 安装ttyd
+RUN  wget https://github.com/tsl0922/ttyd/archive/1.2.1.tar.gz \
+    && tar -xvzf 1.2.1.tar.gz -C ./ \
+    && cd ttyd-1.2.1 \
+    &&  mkdir build && cd build &&  pwd
+RUN cd /ttyd-1.2.1/build  && echo "CMAKE_C_FLAGS:STRING=--std=c99"  >> ./CMakeCache.txt \
+    && cmake .. && make && make install && rm -rf /*.gz
 
 # Config bashrc/bash_profile
 RUN echo "alias ls='ls --color=auto'" >> /root/.bashrc
