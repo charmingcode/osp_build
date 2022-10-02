@@ -44,6 +44,10 @@ RUN yum install -y git automake libtool make.x86_64 cmake.x86_64 patch
 COPY install-dependencies.sh .
 RUN ./install-dependencies.sh
 
+# Install hbase
+COPY hbase-2.1.3-bin.tar.gz .
+RUN tar zxvf hbase-2.1.3-bin.tar.gz -C /usr/local
+
 # wtty
 # 安装依赖
 RUN yum -y install vim-common cmake json-c-devel libwebsockets-devel openssl-devel wget make
@@ -64,8 +68,8 @@ COPY wtty .
 RUN mv wtty /usr/bin/
 
 # Config bashrc/bash_profile
-RUN echo "alias ls='ls --color=auto'" >> /root/.bashrc
-RUN echo "alias vi='vim'" >> /root/.bashrc
+# RUN echo "alias ls='ls --color=auto'" >> /root/.bashrc
+# RUN echo "alias vi='vim'" >> /root/.bashrc
 #RUN cd /usr/bin && ln -s python2 python && cd -
 
 #ENTRYPOINT [ "/bin/bash" ]
