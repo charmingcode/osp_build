@@ -8,7 +8,7 @@ FROM centos:7
 #RUN yum install -y yum-plugin-ovl
 
 # Install system tools
-RUN yum install -y which vim tree wget net-tools.x86_64 sudo
+RUN yum install -y which vim tree wget net-tools.x86_64 sudo readline-devel readline
 
 # Install ssh
 RUN yum install -y openssh-server libaio libnsl
@@ -37,16 +37,18 @@ RUN yum install -y git automake libtool make.x86_64 cmake.x86_64 patch
 
 
 # Install kube
-
 # RUN curl -LO https://dl.k8s.io/release/v1.21.3/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl && chmod +x /usr/local/bin/kubectl
 
 # Install seastar 
-COPY install-dependencies.sh .
-RUN ./install-dependencies.sh
+# COPY install-dependencies.sh .
+# RUN ./install-dependencies.sh
 
 # Install hbase
 COPY hbase-2.1.3-bin.tar.gz .
 RUN tar zxvf hbase-2.1.3-bin.tar.gz -C /usr/local
+
+# Install mysql
+RUN yum install -y mysql mysql-devel
 
 # wtty
 # 安装依赖

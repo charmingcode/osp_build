@@ -119,11 +119,14 @@ def prepare_after_start(env):
             pass
 
     if env.port == "0":
-        sock = socket.socket()
-        sock.bind(("", 0))
-        env.port = str(sock.getsockname()[1])
-        sock.close()
-        ports = [env.port]
+        if env.ssh_port != "0":
+            env.port = env.ssh_port
+        else:
+            sock = socket.socket()
+            sock.bind(("", 0))
+            env.port = str(sock.getsockname()[1])
+            sock.close()
+            ports = [env.port]
 
     if is_linux_platform():
         env.group = runex("cat " + env.home +
